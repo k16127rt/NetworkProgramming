@@ -1,15 +1,22 @@
 #include<sys/socket.h>
 #include<unistd.h>
 #include<arpa/inet.h>
-#include<stdio.h>//printf‚ğg‚¤‚©‚ç•K—v
+#include<stdio.h>//printfã‚’ä½¿ã†ã‹ã‚‰å¿…è¦
 #define BUF_SIZE 256
-#include<string.h>//strleng‚¤‚©‚ç
+#include<string.h>//strlenä½¿ã†ã‹ã‚‰
+#include<stdlib.h>
+
+//ã‚¨ãƒ©ãƒ¼å‡¦ç†ç”¨ã®é–¢æ•°å®šç¾©
+voidDieWithError(char *erorMessage){
+	perror(erorMessage);
+	exit(1);
+}
 
 
-//ƒƒbƒZ[ƒW‚ğóM‚µ‚Ä•\¦‚·‚éƒR[ƒh
+//ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å—ä¿¡ã—ã¦è¡¨ç¤ºã™ã‚‹ã‚³ãƒ¼ãƒ‰
 void commun(int sock) {
 	char buf[BUF_SIZE];
-	int len_r;//óM•¶š”
+	int len_r;//å—ä¿¡æ–‡å­—æ•°
 	char *message = "";
 	if(send(sock, message, strlen(message), 0) != strlen(message))
 		DieWithError("send()sent a message of unexpected bytes");
@@ -22,8 +29,8 @@ void commun(int sock) {
 }
 
 int main(int argc, char **argv) {
-	//clisok:‚Ù‚©‚Ì‚Æ‚±‚Å‚â‚Á‚Ä‚Ë‚Á‚Ä‚â‚Â
-	//servsock:‘Ò‚¿ó‚¯ê—p
+	//clisok:ã»ã‹ã®ã¨ã“ã§ã‚„ã£ã¦ã­ã£ã¦ã‚„ã¤
+	//servsock:å¾…ã¡å—ã‘å°‚ç”¨
 	int cliSock;
 	int servSock = socket(PF_INET, SOCK_STREAM, 0);
 	struct sockaddr_in servAddress;
@@ -31,13 +38,13 @@ int main(int argc, char **argv) {
 	unsigned int szClientAddr;
 	
 	servAddress.sin_family = AF_INET;
-	servAddress.sin_addr.s_addr = htonl(INADDR_ANY);//INADDR_ANY:ƒCƒ“ƒ^[ƒlƒbƒg‚ÌƒAƒhƒŒƒX‚¾‚Á‚½‚ç‚È‚ñ‚Å‚à‚¢‚¢
-	servAddress.sin_port = htons(10001);//10001”Ôƒ|[ƒg‚àÚ‘±‚µ‚Ä‚«‚½‚ç‘Î‰‚·‚é
+	servAddress.sin_addr.s_addr = htonl(INADDR_ANY);//INADDR_ANY:ã‚¤ãƒ³ã‚¿ãƒ¼ãƒãƒƒãƒˆã®ã‚¢ãƒ‰ãƒ¬ã‚¹ã ã£ãŸã‚‰ãªã‚“ã§ã‚‚ã„ã„
+	servAddress.sin_port = htons(10001);//10001ç•ªãƒãƒ¼ãƒˆã‚‚æ¥ç¶šã—ã¦ããŸã‚‰å¯¾å¿œã™ã‚‹
 	bind(servSock, (struct sockaddr *)&servAddress, sizeof(servAddress));
-	listen(servSock, 5);//‡”Ô‘Ò‚¿‚Å‚«‚éƒNƒ‰ƒCƒAƒ“ƒg”(Ú‘±‘Ò‚¿”)
+	listen(servSock, 5);//é †ç•ªå¾…ã¡ã§ãã‚‹ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆæ•°(æ¥ç¶šå¾…ã¡æ•°)
 	while(1){
 		szClientAddr = sizeof(clientAddress);
-		cliSock = accepct(servSock, (struct sockaddr *)&clientAddress, &szClientAddr);
+		cliSock = accept(servSock, (struct sockaddr *)&clientAddress, &szClientAddr);
 		commun(cliSock);
 	}
 	
