@@ -7,7 +7,7 @@
 #include<stdlib.h>
 
 //エラー処理用の関数定義
-voidDieWithError(char *erorMessage){
+void　DieWithError(char *erorMessage){
 	perror(erorMessage);
 	exit(1);
 }
