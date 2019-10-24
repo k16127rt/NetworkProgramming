@@ -68,6 +68,29 @@ void my_scanf(char *buf, int num_letter)
     getchar();
 }
 
+// 区切り文字が出るまで、または最大文字数を受信するまで受信を繰り返す
+// ただしmax_lengthはバッファサイズ。末尾に必ず'\0'をつけて返す。
+void read_until_delim(int sock, char *buf, char delimiter, int max_length)
+{
+    int len_r = 0;        // 受信文字数
+    int index_letter = 0; // 受信文字数の合計
+
+    while (index_letter < max_length - 1)
+    {
+        // 1文字だけ受信
+        if ((len_r = recv(sock, buf + index_letter, 1, 0)) <= 0)
+            DieWithError("recv() failed");
+
+        // 受信した文字が区切り文字ならループを抜ける
+        if (buf[index_letter] == delimiter)
+            break;
+        else
+            index_letter++;
+    }
+    // nullを末尾に追加
+    buf[index_letter] = '\0';
+}
+
 void commun(int sock)
 {
     char cmd[2] = "";                    //コマンド入力用
@@ -95,7 +118,7 @@ void commun(int sock)
         //残高照会
         strcpy(msg, "0_0_");
         break;
-    default;
+    default:
         //終了
         printf("番号が確認できませんでした。\n");
         return;
@@ -109,25 +132,3 @@ void commun(int sock)
     //表示処理
     printf("残高は%d円になりました", atoi(msg));
 }
-void read_until_delim(int sock, char *buf, char delimiter, int max_length);
-{
-    int len_r = 0;        //受信文字数
-    int index_letter = 0; //受信文字数の合計
-
-    while (index_letter < max_length - 1)
-    {
-        //1文字だけ受信
-
-        if ((len_r = recv(sock, buf + index_letter, 1, 0)) <= 0)
-        {
-            //エラー
-            printf("接続が切れました\n");
-            return;
-        }
-
-        if (buf[index_letter] == delimiter)
-            //区切り文字を受信→ループを抜ける
-            break;
-        else
-            index_letter;
-    }
